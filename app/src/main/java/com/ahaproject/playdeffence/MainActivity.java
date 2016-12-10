@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 
 class MainActivity extends Activity{
 
@@ -16,6 +17,13 @@ class MainActivity extends Activity{
         super.onCreate(savedInstanceState);
         mGLView = new MyGLSurfaceView(this);//Contextを渡す
         setContentView(mGLView);//描画で使うものの設定
+    }
+
+    //イベントドリスナ
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        return true;//常に消化したとする
     }
 
 
