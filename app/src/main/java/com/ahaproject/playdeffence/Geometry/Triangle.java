@@ -81,10 +81,16 @@ public class Triangle extends C_Geometry {
         GLES20.glEnableVertexAttribArray(positionAttrib);//その情報へのアクセスを有効にする。
         //対応付け終了。
        //GLES20.glVertexAttribPointer(positionAttrib,vertices.length, GLES20.GL_FLOAT, false, 0, vertexBuffer);
-       //関連付けている値のところにデータを渡す。
-        GLES20.glVertexAttribPointer(positionAttrib, 3, GLES20.GL_FLOAT, false, 3 *4, vertexBuffer);
-        //描画の仕方指定　
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertices.length/3);
+       //関連付けている値のところにデータを渡す。 ポジション（ｘ、ｙ、ｚ,w）で渡す
+        GLES20.glVertexAttribPointer(positionAttrib,        //シェーダー変数の位置
+                                    3,                      //頂点一つ当たりの要素数
+                                    GLES20.GL_FLOAT,        //データのフォーマット
+                                    false,                  //正規化するかどうかのフラグ
+                12,       //頂点データの先頭から次の頂点データまでのバイト数
+                vertexBuffer);                              //頂点データのポインタ
+
+        //描画の仕方指定　GL_TRIANGLES トライアングルファン　頂点数　
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, vertices.length/3);
 
         GLES20.glDisableVertexAttribArray(positionAttrib);
 
