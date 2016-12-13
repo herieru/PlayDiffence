@@ -1,12 +1,14 @@
 package com.ahaproject.playdeffence.TouchController;
 
+import android.view.MotionEvent;
+
 /**
  * Created by akihiro on 2016/12/13.
  * タッチイベントに対して、アクセスする関数群
  *
  */
 
-public class TouchInfoAccess extends TouchInfoStruct{
+class TouchInfoAccess extends TouchInfoStruct{
 
 
     public class TOUCH_POS{

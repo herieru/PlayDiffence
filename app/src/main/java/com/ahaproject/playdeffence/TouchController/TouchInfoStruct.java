@@ -5,12 +5,13 @@ package com.ahaproject.playdeffence.TouchController;
  * タッチの情報の受け渡しする為の構造体クラス
  */
 
-public class TouchInfoStruct {
+class TouchInfoStruct {
     protected float touch_x,touch_y;       //タッチしている位置
     protected float press_z;               //タッチしている加減
-    protected float prev_x,prev_y;        //一つ前の状態
+    protected float prev_x,prev_y;        //一つ前座標
     protected TouchState state;             //タッチの状態
     protected boolean use;                  //このクラスを使用しているか？
+    protected int p_index;                  //ポインターINDEX　　タッチした時に割り振られる　離すまで保持
 
     //コンストラクタ
     protected TouchInfoStruct(){
@@ -21,12 +22,8 @@ public class TouchInfoStruct {
         prev_x = 0;
         prev_y = 0;
         state = TouchState.OnDoNotTouch;//最初は割り振られていない状態。
+        p_index = -1;
     }
 
-    //更新
-    public void Update()
-    {
-
-    }
 
 }

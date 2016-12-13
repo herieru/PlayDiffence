@@ -6,9 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 
+import com.ahaproject.playdeffence.TouchController.TouchManager;
+
 class MainActivity extends Activity{
 
     private MyGLSurfaceView mGLView;
+    private TouchManager touch;
     GLRender mRenderer;
     GLSurfaceView glSurfaceView;
 
@@ -16,6 +19,7 @@ class MainActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mGLView = new MyGLSurfaceView(this);//Contextを渡す
+        touch = TouchManager.getInstance();
         setContentView(mGLView);//描画で使うものの設定
     }
 
@@ -55,6 +59,8 @@ class MainActivity extends Activity{
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+        touch.SetTouchEvent(event);
+
         return true;//常に消化したとする
     }
 
