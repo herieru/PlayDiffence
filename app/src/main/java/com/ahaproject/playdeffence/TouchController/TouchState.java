@@ -8,6 +8,6 @@ public enum TouchState {
     OnTouchStart,//タッチしました。
     OnTouchMove,//タッチした状態で、移動
     OnTouchSlash,//一定距離を一瞬で動いた。
-    OnTouchReMove,//タッチを離した。
+    OnTouchRemove,//タッチを離した。
     OnDoNotTouch,// 何もしていない状態。
 }

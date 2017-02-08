@@ -13,12 +13,11 @@ public class TouchManager {
     private static TouchManager ourInstance = new TouchManager();
     //device info
     private final int MAX_TOUCH_DEVEICE = 4;
-    //public TouchInfoAccess access_device[] = new TouchInfoAccess[MAX_TOUCH_DEVEICE];
+    public TouchInfoAccess access_device[] = new TouchInfoAccess[MAX_TOUCH_DEVEICE];
 
     public static TouchManager getInstance() {
         return ourInstance;
     }
-
 
     private TouchManager() {
 
@@ -26,21 +25,34 @@ public class TouchManager {
 
     public boolean SetTouchEvent(MotionEvent event)
     {
+        boolean flg = false;
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN://おろしたとき
                 Log.d("TouchON","X:"+event.getX()+"Y:"+event.getY()+"Z:" + event.getPressure());
+                flg = true;
                 break;
             case MotionEvent.ACTION_MOVE://移動したとき
                 Log.d("TouchMOVE","X:"+event.getX()+"Y:"+event.getY()+"Z:" + event.getPressure());
+                flg =  true;
                 break;
             case MotionEvent.ACTION_UP://あげたとき。
                 Log.d("TouchUP","X:"+event.getX()+"Y:"+event.getY()+"Z:" + event.getPressure());
+                flg = true;
+                break;
+            default:
+                Log.d("Default","Switch Default TouchManager");
+                flg =  true;
                 break;
         }
-
+        //情報を収めるのに成功したらtrue
+        if(flg)
+            return true;
         return false;
     }
+
+
+
 
 
 

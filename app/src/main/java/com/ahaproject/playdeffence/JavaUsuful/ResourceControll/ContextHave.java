@@ -26,7 +26,7 @@ public class ContextHave {
         this.context = context;
         return true;//仮
     }
-    
+
 
 
 
