@@ -50,7 +50,21 @@ public class Polygon extends C_Geometry{
         GLES20.glAttachShader(shaderProgram, fragmentShader);
         GLES20.glLinkProgram(shaderProgram);
 
-
+        //スクリーンサイズ
+        Vector3 scren = GLManager.GetInstance().GetWindowSize();
+        //Redo the Viewport,making it fullscreen
+        GLES20.glViewport(0,0,(int)scren.x,(int)scren.y);
+        //Clear our matrices
+        Matrix.setIdentityM(mtrxProjection,0);
+        Matrix.setIdentityM(mtrxView,0);
+        Matrix.setIdentityM(MtrixProgectionAndView,0);
+        Matrix.orthoM(mtrxProjection,0,0f,scren.x,0f,scren.y,0,50);
+        Matrix.setLookAtM(mtrxView,0,
+                0f,0f,1f,
+                0f,0f,0f,
+                0f,1.0f,0.0f);
+        Matrix.multiplyMM(MtrixProgectionAndView,0,mtrxProjection,0,mtrxView,0);
+        mat = MtrixProgectionAndView;
 
     }
 
@@ -107,6 +121,7 @@ public class Polygon extends C_Geometry{
                 false,                  //正規化するかどうかのフラグ
                 12,       //頂点データの先頭から次の頂点データまでのバイト数 (1頂点当たりのバイト数)
                 vertexBuffer);                              //頂点データのポインタ
+
 
         int mtrxhandle = GLES20.glGetUniformLocation(shaderProgram,"uMVPMatrix");
         GLES20.glEnableVertexAttribArray(mtrxhandle);//その情報へのアクセスを有効にする。
