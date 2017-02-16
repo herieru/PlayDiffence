@@ -9,6 +9,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.TouchController.TouchManager;
 
@@ -33,6 +34,8 @@ class MainActivity extends Activity{
         height = point.y;
 
         GLManager.GetInstance().SetWindowSize(width,height);
+        ContextHave.getInstance().SetContext(this);
+
 
     }
 

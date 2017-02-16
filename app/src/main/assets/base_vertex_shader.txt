@@ -1,0 +1,6 @@
+//this string vertex shader base
+attribute vec4 vPosition;
+uniform mat uMVPMatrix;
+void main(){
+ gl_Position = uMVPMatrix * vPosition;
+}

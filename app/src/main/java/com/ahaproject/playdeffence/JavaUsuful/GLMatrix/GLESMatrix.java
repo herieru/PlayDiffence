@@ -10,7 +10,7 @@ package com.ahaproject.playdeffence.JavaUsuful.GLMatrix;
 public class GLESMatrix {
 
     //this class is important value
-    float[] mat = new float[16];
+    public float[] mat = new float[16];
 
     //this class first
     GLESMatrix()

@@ -7,7 +7,6 @@ import com.ahaproject.playdeffence.Geometry.Polygon;
 import com.ahaproject.playdeffence.Geometry.Triangle;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 
-import javax.microedition.khronos.egl.*;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -48,8 +47,9 @@ public class GLRender implements GLSurfaceView.Renderer{
         GLES20.glClearColor(0.0f,0.0f,1.0f,1);
         //バッファーをきれいに？
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        triangle.draw();
+
         polygon.draw();
+        triangle.draw();
         //orijin_polygon.draw();
     }
 }

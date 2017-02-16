@@ -1,10 +1,14 @@
 package com.ahaproject.playdeffence.Geometry;
 
+
+
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.Velocity.Vector3;
+
+
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,8 +29,7 @@ public class Polygon extends C_Geometry{
 
 
     //コンストラクタ
-    public Polygon()
-    {
+    public Polygon() {
         //uniformはCPUから定数
         //vertexshader　　　attribute　は　頂点情報であるということの宣言
         vertexShaderCode ="attribute  vec4 vPosition;" +
@@ -35,6 +38,9 @@ public class Polygon extends C_Geometry{
                 "void main() {" +
                 "  gl_Position =  uMVPMatrix * vPosition;" +
                 "}";
+
+
+
         //picell shader
         fragmentShaderCode =//mediump は　演算制度
                 "precision mediump float;" +
@@ -55,17 +61,7 @@ public class Polygon extends C_Geometry{
         //Redo the Viewport,making it fullscreen
         GLES20.glViewport(0,0,(int)scren.x,(int)scren.y);
         //Clear our matrices
-        Matrix.setIdentityM(mtrxProjection,0);
-        Matrix.setIdentityM(mtrxView,0);
-        Matrix.setIdentityM(MtrixProgectionAndView,0);
-        Matrix.orthoM(mtrxProjection,0,0f,scren.x,0f,scren.y,0,50);
-        Matrix.setLookAtM(mtrxView,0,
-                0f,0f,1f,
-                0f,0f,0f,
-                0f,1.0f,0.0f);
-        Matrix.multiplyMM(MtrixProgectionAndView,0,mtrxProjection,0,mtrxView,0);
-        mat = MtrixProgectionAndView;
-
+        Matrix.setIdentityM(mat,0);
     }
 
     @Override
@@ -92,12 +88,15 @@ public class Polygon extends C_Geometry{
         GLES20.glUseProgram(shaderProgram);
 
         float vertices[] = {
-                -0.2f, 0.5f, 0.0f,//三角形の点A(x,y,z)
-                -0.5f, -0.5f, 0.0f,//三角形の点B(x,y,z)
-                0.5f, -0.5f, 0.0f,//三角形の点C(x,y,z)
-                0.7f,0.3f,0.0f,
+                -1.0f, 0.0f, 0.0f,//三角形の点A(x,y,z)
+                -1.0f, -1.0f, 0.0f,//三角形の点B(x,y,z)
+                0.0f, -1.0f, 0.0f,//三角形の点C(x,y,z)
+                0.0f,0.0f,0.0f,
         };
-        Matrix.setIdentityM(mat,0);
+
+
+
+
 
 
         //最後の４はfloat型故
