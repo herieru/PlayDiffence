@@ -2,14 +2,19 @@ package com.ahaproject.playdeffence.Geometry;
 
 
 
+import android.content.res.AssetManager;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.Velocity.Vector3;
 
 
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -38,6 +43,35 @@ public class Polygon extends C_Geometry{
                 "void main() {" +
                 "  gl_Position =  uMVPMatrix * vPosition;" +
                 "}";
+        String[] file_list = null;
+        AssetManager asset =ContextHave.getInstance().GetContext().getAssets();
+
+        try{
+            file_list = asset.list("Shader/vertex_shader");
+
+        }catch(IOException e)//例外発生時のシグナル これは入出力のシグナル
+        {
+            e.printStackTrace();//スロー可能なオブジェクトとそのバックストリーム出力
+        }
+        int abc = file_list.length;
+
+        BufferedReader br ;
+        StringBuilder sb = new StringBuilder();
+        String strs = null;
+        String text = null;
+        try {
+            InputStream is = asset.open("Shader/" + file_list[0].toString());
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((strs = br.readLine()) != null) {
+                sb.append(strs);
+            }
+            br.close();
+            text = sb.toString();
+        }catch (IOException es)
+        {
+            text = "io error";
+
+        }
 
 
 
