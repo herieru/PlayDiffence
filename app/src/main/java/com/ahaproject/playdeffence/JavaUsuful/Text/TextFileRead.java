@@ -215,6 +215,11 @@ public class TextFileRead {
         rtn_str = cheak_str.substring(0,cnt);
         return rtn_str;
     }
+    public void ResetinString()
+    {
+        read_str = null;
+    }
+
 
 
 

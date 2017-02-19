@@ -2,20 +2,17 @@ package com.ahaproject.playdeffence.Geometry;
 
 
 
-import android.content.res.AssetManager;
+
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
+
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
 import com.ahaproject.playdeffence.Velocity.Vector3;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -38,23 +35,12 @@ public class Polygon extends C_Geometry{
     public Polygon() {
         //uniformはCPUから定数
         //vertexshader　　　attribute　は　頂点情報であるということの宣言
-        vertexShaderCode ="attribute  vec4 vPosition;" +
-                          //"attribute  vec4 num;"+
-                "uniform  mat4 uMVPMatrix;" +
-                "void main() {" +
-                "  gl_Position =  uMVPMatrix * vPosition;" +
-                "}";
+        vertexShaderCode =null;
         TextFileRead textread = new TextFileRead();
-        String get_text = textread.GetShaderSourceforTextFile("Shader/vertex_shader","base_vertex_shader.txt");
-        vertexShaderCode = get_text;
-
-
+        vertexShaderCode = textread.GetShaderSourceforTextFile("Shader/vertex_shader","base_vertex_shader.txt");
+        textread.ResetinString();
         //picell shader
-        fragmentShaderCode =//mediump は　演算制度
-                "precision mediump float;" +
-                        "void main() {" +
-                        "  gl_FragColor =vec4(0.0, 1.0, 0.0, 1.0);" +
-                        "}";
+        fragmentShaderCode = textread.GetShaderSourceforTextFile("Shader/flagment_shader","base_flagment_shader.txt");
         //コンパイルしているIDをもらっている。
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
