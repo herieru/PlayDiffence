@@ -1,6 +1,6 @@
-//this string vertex shader base
+//this vertex shader text
 attribute vec4 vPosition;
-uniform mat uMVPMatrix;
+uniform mat4 uMVPMatrix;//this matrix
 void main(){
  gl_Position = uMVPMatrix * vPosition;
 }
