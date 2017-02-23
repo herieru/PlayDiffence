@@ -29,8 +29,9 @@ public class GLRender implements GLSurfaceView.Renderer{
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         triangle = new Triangle();
+        orijin_polygon = new MySamplePolygon();
         polygon = new Polygon();
-        //orijin_polygon = new MySamplePolygon();
+
     }
 
     //画面サイズ等が変わった時
@@ -47,9 +48,9 @@ public class GLRender implements GLSurfaceView.Renderer{
         GLES20.glClearColor(0.0f,0.0f,1.0f,1);
         //バッファーをきれいに？
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
+        orijin_polygon.draw();
         polygon.draw();
         triangle.draw();
-        //orijin_polygon.draw();
+
     }
 }

@@ -1,0 +1,9 @@
+//this vertex shader text
+attribute vec4 vPosition;
+uniform mat4 uMVPMatrix;//this matrix
+attribute vec2 texcoord;
+varying vec2 texcoordVaring;
+void main(){
+ gl_Position = vPosition * uMVPMatrix;
+ texcoordVaring =texcoord;
+}

@@ -1,9 +1,16 @@
 package com.ahaproject.playdeffence.Geometry;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
+import com.ahaproject.playdeffence.GLESUsuful.MyGLES20Utiles;
+import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
+import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
+import com.ahaproject.playdeffence.R;
 import com.ahaproject.playdeffence.Velocity.Vector3;
 
 import java.nio.ByteBuffer;
@@ -15,125 +22,122 @@ import java.nio.ShortBuffer;
  * Created by akihiro on 2017/02/12.
  */
 
-public class MySamplePolygon {
-    public static int sp_SplidColor;
+public class MySamplePolygon  extends C_Geometry{
+    private int shaderProgram;
 
-    public static final String vs_SolidColor =
-                    //"uniform mat4 uMVPMatrix;"+
-                    //"attribute vec4 vPosition;"+
-                    //"void main(){"+
-                    //" gl_Position = uMVPMatrix * vPosition;+
-                    //"}";
-                    "attribute  vec4 vPosition;" +
-                    "void main() {" +
-                    "  gl_Position = vPosition;" +
-                    "}";
-    public static final String fs_SolidColor =
-                    "precision mediump float;"+
-                    "void main(){"+
-                    " gl_FragColor = vec4(0.0,0.7,0.3,1.0);"+
-                    "}";
+    //頂点座標
+    private static final float VERTEXS[]= {
+            0.0f,1.0f,0.0f,        //左上
+            0.0f,0.0f,0.0f,       //左下
+            1.0f,1.0f,0.0f,         //右上
+            1.0f,0.0f,0.0f         //右下
+    };
+    //テクスチャUV値
+    private static final float TEXCOORDS[] = {
+            0.0f, 0.0f,	// 左上
+            0.0f, 1.0f,	// 左下
+            1.0f, 0.0f,	// 右上
+            1.0f, 1.0f	// 右下
+    };
 
-    //Our matrices
-    private final float[] mtrxProjection = new float[16];
-    private final float[] mtrxView = new float[16];
-    private final float[] getMtrxProjectionAndView = new float[16];
+    //頂点バッファ保持
+    private final FloatBuffer mVertexBuffer = MyGLES20Utiles.createBuffer(VERTEXS);
 
-    //Geometric variables
-    public static float vertices[];
-    public static short indices[];
-    public FloatBuffer vertexBuffer;
-    public ShortBuffer drawListBuffer;
+    //UVバッファ保持
+    private final FloatBuffer mTexcoordBuffer = MyGLES20Utiles.createBuffer(TEXCOORDS);
 
-    int m_Program;
+    private int mPositionp;
+    private int mTexcoodp;
+    private int mTexturep;
+    private int mMatp;
 
-    public MySamplePolygon()
-    {
-        //スクリーンサイズ
-        Vector3 scren = GLManager.GetInstance().GetWindowSize();
-        //Redo the Viewport,making it fullscreen
-        GLES20.glViewport(0,0,(int)scren.x,(int)scren.y);
-        //Clear our matrices
-        Matrix.setIdentityM(mtrxProjection,0);
-        Matrix.setIdentityM(mtrxView,0);
-        Matrix.setIdentityM(getMtrxProjectionAndView,0);
+    private int mTextureId;
 
+    //コンストラクタ
+    public MySamplePolygon() {
+        //uniformはCPUから定数
+        //vertexshader　　　attribute　は　頂点情報であるということの宣言
+        //コメント文を除いたシェーダーソースを読み込み
+        vertexShaderCode =null;
+        TextFileRead textread = new TextFileRead();
+        vertexShaderCode = textread.GetShaderSourceforTextFile("Shader/vertex_shader","vertex_plas_tex.txt");
+        textread.ResetinString();
+        fragmentShaderCode = textread.GetShaderSourceforTextFile("Shader/flagment_shader","flag,emt_plas_tex.txt");
+        //コンパイルしているIDをもらっている。
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        //シェーダーのプログラムオブジェクト生成？
+        shaderProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(shaderProgram, vertexShader);
+        GLES20.glAttachShader(shaderProgram, fragmentShader);
+        GLES20.glLinkProgram(shaderProgram);
+        //シェーダーで使用するハンドルを取ってくる。
+        mPositionp = GLES20.glGetAttribLocation(shaderProgram,"vPosition");
+        MyGLES20Utiles.checkGlError("glGeAttribLocation position");
+        if(mPositionp == -1)throw  new IllegalStateException("Could not get attrib location fotr position");
+        GLES20.glEnableVertexAttribArray(mPositionp);
 
-        Matrix.orthoM(mtrxProjection,0,0f,scren.x,0f,scren.y,0,50);
-        Matrix.setLookAtM(mtrxView,0,
-                0f,0f,1f,
-                0f,0f,0f,
-                0f,1.0f,0.0f);
-        Matrix.multiplyMM(getMtrxProjectionAndView,0,getMtrxProjectionAndView,0,mtrxView,0);
+        mTexcoodp = GLES20.glGetAttribLocation(shaderProgram,"texcoord");
+        MyGLES20Utiles.checkGlError("glGeAttribLocation texcoord");
+        if(mTexcoodp == -1)throw  new IllegalStateException("Could not get attrib location fotr mtexcoord");
+        GLES20.glEnableVertexAttribArray(mTexcoodp);
 
-        //SetUpTriangle
-        vertices = new float[]
-                {10.0f,200f,0.0f,
-                10.0f,100f,0.0f,
-                100f,100f,0.0f,};
-        indices = new short[]{0,1,2};
-        //The vertex buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(vertices);
-        vertexBuffer.position(0);
-        //initialize byte buffer for the drw list
-        ByteBuffer dlb  = ByteBuffer.allocateDirect(indices.length * 2);//＊2＝short byte
-        drawListBuffer =  dlb.asShortBuffer();
-        drawListBuffer.put(indices);
-        drawListBuffer.position(0);
+        mTexturep = GLES20.glGetUniformLocation(shaderProgram,"texture");
+        MyGLES20Utiles.checkGlError("glGeAttribLocation texture");
+        if(mTexturep == -1)throw  new IllegalStateException("Could not get attrib location fotr texture");
+        GLES20.glEnableVertexAttribArray(mTexturep);
 
-        GLES20.glClearColor(0.0f,0.0f,0.0f,1);
-        //shader set
-        int vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        GLES20.glShaderSource(vertexShader,vs_SolidColor);
-        GLES20.glCompileShader(vertexShader);
-        int fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fragmentShader,fs_SolidColor);
-        GLES20.glCompileShader(fragmentShader);
-        sp_SplidColor = GLES20.glCreateProgram();
-        //add vertex shader
-        GLES20.glAttachShader(sp_SplidColor,vertexShader);
-        //add fragment shader
-        GLES20.glAttachShader(sp_SplidColor,fragmentShader);
-        GLES20.glUseProgram(sp_SplidColor);
+        mMatp = GLES20.glGetUniformLocation(shaderProgram,"uMVPMatrix");
+        if(mMatp == -1)throw new IllegalStateException("Could not get uniform  location uMVPMatrix");
+        GLES20.glEnableVertexAttribArray(mMatp);
+
+        final Bitmap bitmap = BitmapFactory.decodeResource(ContextHave.getInstance().GetContext().getResources(),R.drawable.tex_sample);
+        mTextureId = MyGLES20Utiles.loadTexture(bitmap);
+        bitmap.recycle();
+
+        Matrix.setIdentityM(mat,0);
 
     }
 
-
-
-    public void draw()
-    {
-        GLES20.glUseProgram(sp_SplidColor);
-
-
-
-
-        int mPositionHandle = GLES20.glGetAttribLocation(sp_SplidColor,"vPosition");
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        //Prepare the triangle coordinate data
-        GLES20.glVertexAttribPointer(mPositionHandle,3,GLES20.GL_FLOAT,false,0,vertexBuffer);
-        //Get handle to Shape's transformation matrix
-        /*int mtrxhandle = GLES20.glGetUniformLocation(sp_SplidColor,"uMVPMatrix");
-        //Apply the Projection and view transformation matrix
-        GLES20.glUniformMatrix4fv(mtrxhandle,1,false,getMtrxProjectionAndView,0);*/
-        //Draw the triangle
-        //GLES20.glDrawElements(GLES20.GL_TRIANGLES,indices.length,GLES20.GL_UNSIGNED_SHORT,drawListBuffer);
-
-        //Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
-
+    @Override
+    public int LoadShaderFile(String vertex, String fragment) {
+        //未実装
+        return 0;
     }
 
+    @Override
+    public int loadShader(int type, String shaderCode) {
+        //シェーダーオブジェクトの生成
+        int shader = GLES20.glCreateShader(type);
+        //シェーダーオブジェクトとソースコードを結びつける
+        GLES20.glShaderSource(shader, shaderCode);
+        //コンパイル
+        GLES20.glCompileShader(shader);
+        return shader;
+    }
 
+    @Override
+    public void draw() {
+        //使うシェーダープログラム　適用
 
+        GLES20.glUseProgram(shaderProgram);
+        // 背景とのブレンド方法を設定します。
+        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+      //  GLES20.glEnable(GLES20.GL_BLEND);
+       // GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);	// 単純なアルファブレンド
 
+        // テクスチャの指定
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
+        GLES20.glUniform1i(mTexturep, 0);
+        GLES20.glUniformMatrix4fv(mMatp,1,false,mat,0);
+        GLES20.glVertexAttribPointer(mTexcoodp, 2, GLES20.GL_FLOAT, false, 0, mTexcoordBuffer);
+        GLES20.glVertexAttribPointer(mPositionp, 3, GLES20.GL_FLOAT, false, 0, mVertexBuffer);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
+      //  GLES20.glDisable(GLES20.GL_BLEND);
+        GLES20.glDisable(GLES20.GL_TEXTURE_2D);
 
-
-
-
-
+    }
 
 }

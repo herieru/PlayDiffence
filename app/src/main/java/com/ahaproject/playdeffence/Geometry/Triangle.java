@@ -97,7 +97,7 @@ public class Triangle extends C_Geometry {
         //描画の仕方指定　GL_TRIANGLES トライアングルファン　頂点数　
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, vertices.length/3);
         //アクセスを無効にする？
-        GLES20.glDisableVertexAttribArray(positionAttrib);
+        //GLES20.glDisableVertexAttribArray(positionAttrib);
 
 
 
