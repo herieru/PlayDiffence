@@ -18,8 +18,8 @@ public class AssetLoader {
 
     private AssetLoader() {}
 
-    /*リソースのファイル名とリソースのファイル名を見てそのBitmapを作成する。*/
-    public Bitmap BitmapLoader(String SetAssetFilePath,String GetResouceFileName)
+    /*リソースのファイルパス名（Asset以下）とリソースのファイル名を見てそのBitmapを作成する。*/
+    public static  Bitmap BitmapLoader(String SetAssetFilePath,String GetResouceFileName)
     {
         Bitmap bitmap = null;
         //texture reading
@@ -60,7 +60,7 @@ public class AssetLoader {
         return bitmap;
     }
 
-    public Bitmap[] GetBitmapsLoader(String SetAssetFilePath,String GetResouceFileName)
+    public static Bitmap[] GetBitmapsLoader(String SetAssetFilePath,String GetResouceFileName)
     {
         //texture reading
         AssetManager asset = ContextHave.getInstance().GetContext().getAssets();

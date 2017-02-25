@@ -1,9 +1,5 @@
 package com.ahaproject.playdeffence.Geometry;
 
-
-
-
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
@@ -11,6 +7,8 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
 
+import com.ahaproject.playdeffence.GLESUsuful.MyGLES20Utiles;
+import com.ahaproject.playdeffence.JavaUsuful.Loader.AssetLoader;
 import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
@@ -18,16 +16,10 @@ import com.ahaproject.playdeffence.R;
 import com.ahaproject.playdeffence.Velocity.Vector3;
 
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-
-import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
-import javax.microedition.khronos.opengles.GL11Ext;
 
 /**
  * Created by akihiro on 2016/12/18.
@@ -54,9 +46,9 @@ public class Polygon extends C_Geometry{
             1.0f,1.0f//右下
     };
 
-    private int m_Postion_p;    //
-    private int m_TexCoord_p;   //
-    private int m_Texture_p;    //
+    private int m_Postion_p;    //ポジションのアクセス
+    private int m_TexCoord_p;   //テクスチャコードのアクセス
+    private int m_Texture_p;    //テクスチャのアクセス
 
     //コンストラクタ
     public Polygon() {
@@ -77,78 +69,37 @@ public class Polygon extends C_Geometry{
         GLES20.glAttachShader(shaderProgram, fragmentShader);
         GLES20.glLinkProgram(shaderProgram);
 
-        //スクリーンサイズ
-        Vector3 scren = GLManager.GetInstance().GetWindowSize();
-        //Redo the Viewport,making it fullscreen
-        GLES20.glViewport(0,0,(int)scren.x,(int)scren.y);
         //Clear our matrices
         Matrix.setIdentityM(mat,0);
-
         //texture reading
-        AssetManager asset = ContextHave.getInstance().GetContext().getAssets();
-        String[] tex_file_list = null;
-        try{
-            tex_file_list = asset.list("texture");
-        }catch (IOException e)//入力（ファイル、キーボードやネットワーク接続など）
-        {
-            e.printStackTrace();//エラーメッセージ？
-        }
-        Bitmap bitmap = null;
-        BufferedInputStream bis = null;
-        try{
-            bis = new BufferedInputStream(asset.open("texture/"+tex_file_list[0].toString()));
-            bitmap = BitmapFactory.decodeStream(bis);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try{
-                bis.close();
-            }
-            catch(Exception ex) {
-            }
-        }
-
+        Bitmap bitmap = BitmapFactory.decodeResource(ContextHave.getInstance().GetContext().getResources(),R.drawable.tex_sample);//AssetLoader.BitmapLoader("texture","tex_sample.bmp");
         /*GLES20.glGenTextures
         * GL sizei n 生成するテクスチャオブジェクト数
         *テクスチャオブジェクトの格納先のid先
         * offset
         * */
-        GLES20.glGenTextures(1,tex_id,0);
-
+       // GLES20.glGenTextures(1,tex_id,0);
         /*GLES20.glPixelStorei
         * commnad UNPACK…テクスチャをピクセルにアップ PACLK…テクスチャからテクセルをダウンロード
         * 何バイトごとの区切りか
         * */
-        GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT,1);
+        //GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT,1);
         //Bind texture   +???
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+       // GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         //ここで初めてテクスチャのメモリ確保
         /*
         メモリの利用方法　target
         * */
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);
+        //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);
         //VRAMへピクセル情報をコピー
-        //GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,bitmap,0);
-
+        //GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,GLES20.GL_RGBA,0,bitmap,0);
         //SetFilterring
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);
-        //Load the bitmap into the bound texture
-
+        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
+        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);
+       m_Texture_p = MyGLES20Utiles.loadTexture(bitmap);
 
         //bye bitmap
         bitmap.recycle();
-
-
-      /*  Bitmap bits = BitmapFactory.decodeResource(ContextHave.getInstance().GetContext().getResources(), R.drawable.tex_sample);
-        GLES20.glGenTextures(1,tex_id,0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bits,0);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);
-        bits.recycle();
-*/
     }
 
     @Override
@@ -173,14 +124,7 @@ public class Polygon extends C_Geometry{
         //使うシェーダープログラム　適用
 
         GLES20.glUseProgram(shaderProgram);
-
-
-
-
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
-        //ブレンド方法
-        //GLES20.glEnable(GLES20.GL_BLEND);
-      //  GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);	// 単純なアルファブレンド
 
         //最後の４はfloat型故
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -230,24 +174,7 @@ public class Polygon extends C_Geometry{
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertices.length/3);
 
         //アクセスを無効にする？
-      //  GLES20.glDisable(GLES20.GL_BLEND);
+       // GLES20.glDisable(GLES20.GL_BLEND);
         GLES20.glDisable(GLES20.GL_TEXTURE_2D);
     }
-
-    public void drawatonce(GL10 gl)
-    {
-        gl.glColor4x(0x10000, 0x10000, 0x10000, 0x10000);
-        gl.glActiveTexture(GL10.GL_TEXTURE0);
-        //テクスチャIDに対応するテクスチャをバインドする
-        gl.glBindTexture(GL10.GL_TEXTURE_2D, tex_id[0]);
-        //テクスチャの座標と幅と高さを指定
-        int rect[] = { 0,128,128,-128};
-        //テクスチャ画像のどの部分を使うかを指定
-
-        ((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D,GL11Ext.GL_TEXTURE_CROP_RECT_OES, rect, 0);
-
-        ((GL11Ext) gl).glDrawTexfOES( 0,0,0,50,50);
-    }
-
-
 }

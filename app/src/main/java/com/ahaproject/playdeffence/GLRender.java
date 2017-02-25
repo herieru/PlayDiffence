@@ -32,6 +32,7 @@ public class GLRender implements GLSurfaceView.Renderer{
         orijin_polygon = new MySamplePolygon();
         polygon = new Polygon();
 
+
     }
 
     //画面サイズ等が変わった時
@@ -51,6 +52,5 @@ public class GLRender implements GLSurfaceView.Renderer{
         orijin_polygon.draw();
         polygon.draw();
         triangle.draw();
-
     }
 }
