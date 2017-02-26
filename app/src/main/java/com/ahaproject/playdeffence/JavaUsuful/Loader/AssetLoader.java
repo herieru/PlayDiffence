@@ -1,5 +1,6 @@
 package com.ahaproject.playdeffence.JavaUsuful.Loader;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,8 +43,9 @@ public class AssetLoader {
             if(tex_file_list[cnt].equals(GetResouceFileName))
                 break;
             cnt++;
-            break;
         }
+
+        Context context = ContextHave.getInstance().GetContext();
 
         try{
             bis = new BufferedInputStream(asset.open(SetAssetFilePath + "/"+tex_file_list[cnt].toString()));
@@ -57,6 +59,13 @@ public class AssetLoader {
             catch(Exception ex) {
             }
         }
+
+
+
+
+
+
+
         return bitmap;
     }
 

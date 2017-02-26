@@ -72,31 +72,25 @@ public class Polygon extends C_Geometry{
         //Clear our matrices
         Matrix.setIdentityM(mat,0);
         //texture reading
-        Bitmap bitmap = BitmapFactory.decodeResource(ContextHave.getInstance().GetContext().getResources(),R.drawable.tex_sample);//AssetLoader.BitmapLoader("texture","tex_sample.bmp");
-        /*GLES20.glGenTextures
-        * GL sizei n 生成するテクスチャオブジェクト数
-        *テクスチャオブジェクトの格納先のid先
-        * offset
-        * */
-       // GLES20.glGenTextures(1,tex_id,0);
-        /*GLES20.glPixelStorei
-        * commnad UNPACK…テクスチャをピクセルにアップ PACLK…テクスチャからテクセルをダウンロード
-        * 何バイトごとの区切りか
-        * */
-        //GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT,1);
-        //Bind texture   +???
-       // GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        //ここで初めてテクスチャのメモリ確保
-        /*
-        メモリの利用方法　target
-        * */
-        //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);
+        Bitmap bitmap = AssetLoader.BitmapLoader("texture","tex_sample.bmp");
+        //GLES20.glGenTextures
+        // GL sizei n 生成するテクスチャオブジェクト数
+        //テクスチャオブジェクトの格納先のid先
+        // offset
+
+        GLES20.glGenTextures(1,tex_id,0);
+        //GLES20.glPixelStorei
+        //commnad UNPACK…テクスチャをピクセルにアップ PACLK…テクスチャからテクセルをダウンロード
+        // 何バイトごとの区切りか
+        GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT,1);
+        //メモリの利用方法　target
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);
         //VRAMへピクセル情報をコピー
-        //GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,GLES20.GL_RGBA,0,bitmap,0);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,bitmap,0);
         //SetFilterring
-        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
-        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);
-       m_Texture_p = MyGLES20Utiles.loadTexture(bitmap);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_NEAREST);
+        //m_Texture_p = MyGLES20Utiles.loadTexture(bitmap);
 
         //bye bitmap
         bitmap.recycle();
@@ -125,6 +119,7 @@ public class Polygon extends C_Geometry{
 
         GLES20.glUseProgram(shaderProgram);
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+        GLES20.glDisable(GLES20.GL_BLEND);
 
         //最後の４はfloat型故
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -174,7 +169,7 @@ public class Polygon extends C_Geometry{
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertices.length/3);
 
         //アクセスを無効にする？
-       // GLES20.glDisable(GLES20.GL_BLEND);
+        GLES20.glDisable(GLES20.GL_BLEND);
         GLES20.glDisable(GLES20.GL_TEXTURE_2D);
     }
 }
