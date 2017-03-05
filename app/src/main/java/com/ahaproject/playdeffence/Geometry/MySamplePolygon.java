@@ -7,6 +7,7 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
 import com.ahaproject.playdeffence.GLESUsuful.MyGLES20Utiles;
+import com.ahaproject.playdeffence.GLESUsuful.Shader.ShaderObj;
 import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
@@ -53,24 +54,15 @@ public class MySamplePolygon  extends C_Geometry{
 
     private int mTextureId;
 
+    ShaderObj shaderObj;
+
     //コンストラクタ
     public MySamplePolygon() {
         //uniformはCPUから定数
         //vertexshader　　　attribute　は　頂点情報であるということの宣言
         //コメント文を除いたシェーダーソースを読み込み
-        vertexShaderCode =null;
-        TextFileRead textread = new TextFileRead();
-        vertexShaderCode = textread.GetShaderSourceforTextFile("Shader/vertex_shader","vertex_plas_tex.txt");
-        textread.ResetinString();
-        fragmentShaderCode = textread.GetShaderSourceforTextFile("Shader/flagment_shader","flag,emt_plas_tex.txt");
-        //コンパイルしているIDをもらっている。
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
-        //シェーダーのプログラムオブジェクト生成？
-        shaderProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(shaderProgram, vertexShader);
-        GLES20.glAttachShader(shaderProgram, fragmentShader);
-        GLES20.glLinkProgram(shaderProgram);
+        shaderObj =new ShaderObj("vertex_plas_tex.txt","flag,emt_plas_tex.txt");
+        shaderProgram = shaderObj.GetShaderProgram();
         //シェーダーで使用するハンドルを取ってくる。
         mPositionp = GLES20.glGetAttribLocation(shaderProgram,"vPosition");
         MyGLES20Utiles.checkGlError("glGeAttribLocation position");
@@ -97,23 +89,6 @@ public class MySamplePolygon  extends C_Geometry{
 
         Matrix.setIdentityM(mat,0);
 
-    }
-
-    @Override
-    public int LoadShaderFile(String vertex, String fragment) {
-        //未実装
-        return 0;
-    }
-
-    @Override
-    public int loadShader(int type, String shaderCode) {
-        //シェーダーオブジェクトの生成
-        int shader = GLES20.glCreateShader(type);
-        //シェーダーオブジェクトとソースコードを結びつける
-        GLES20.glShaderSource(shader, shaderCode);
-        //コンパイル
-        GLES20.glCompileShader(shader);
-        return shader;
     }
 
     @Override

@@ -18,15 +18,7 @@ public class C_Geometry implements  BaseGeometry {
     {
 
     }
-    @Override
-    public int LoadShaderFile(String vertex, String fragment) {
-        return 0;
-    }
 
-    @Override
-    public int loadShader(int type, String shadeCode) {
-        return 0;
-    }
 
     @Override
     public void draw() {

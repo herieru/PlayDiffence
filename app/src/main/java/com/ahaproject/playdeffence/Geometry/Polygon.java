@@ -1,22 +1,10 @@
 package com.ahaproject.playdeffence.Geometry;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
-
-import com.ahaproject.playdeffence.GLESUsuful.MyGLES20Utiles;
-import com.ahaproject.playdeffence.JavaUsuful.Loader.AssetLoader;
-import com.ahaproject.playdeffence.JavaUsuful.ResourceControll.ContextHave;
-import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
+import com.ahaproject.playdeffence.GLESUsuful.Shader.ShaderObj;
 import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
-import com.ahaproject.playdeffence.R;
-import com.ahaproject.playdeffence.Velocity.Vector3;
-
-
-
+import com.ahaproject.playdeffence.JavaUsuful.Texture.TextureObj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -25,12 +13,10 @@ import java.nio.FloatBuffer;
  * Created by akihiro on 2016/12/18.
  * ポリゴンを出す為のもの
  */
-
 public class Polygon extends C_Geometry{
 
     private int shaderProgram;
     int[] tex_id = new int [1];
-
     //頂点
     float vertices[] = {
             -1.0f, 0.0f, 0.0f,//三角形の点A(x,y,z) 左上
@@ -48,69 +34,18 @@ public class Polygon extends C_Geometry{
 
     private int m_Postion_p;    //ポジションのアクセス
     private int m_TexCoord_p;   //テクスチャコードのアクセス
-    private int m_Texture_p;    //テクスチャのアクセス
+
+    TextureObj textureobj;//テクスチャの保存オブジェクト
+    ShaderObj shaderObj;//シェーダーオブジェクト
+
 
     //コンストラクタ
     public Polygon() {
-        //uniformはCPUから定数
-        //vertexshader　　　attribute　は　頂点情報であるということの宣言
-        //コメント文を除いたシェーダーソースを読み込み
-        vertexShaderCode =null;
-        TextFileRead textread = new TextFileRead();
-        vertexShaderCode = textread.GetShaderSourceforTextFile("Shader/vertex_shader","vertex_plas_tex.txt");
-        textread.ResetinString();
-        fragmentShaderCode = textread.GetShaderSourceforTextFile("Shader/flagment_shader","flag,emt_plas_tex.txt");
-        //コンパイルしているIDをもらっている。
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
-        //シェーダーのプログラムオブジェクト生成？
-        shaderProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(shaderProgram, vertexShader);
-        GLES20.glAttachShader(shaderProgram, fragmentShader);
-        GLES20.glLinkProgram(shaderProgram);
-
+        shaderObj =new ShaderObj("vertex_plas_tex.txt","flag,emt_plas_tex.txt");
+        shaderProgram = shaderObj.GetShaderProgram();
         //Clear our matrices
         Matrix.setIdentityM(mat,0);
-        //texture reading
-        Bitmap bitmap = AssetLoader.BitmapLoader("texture","tex_sample.bmp");
-        //GLES20.glGenTextures
-        // GL sizei n 生成するテクスチャオブジェクト数
-        //テクスチャオブジェクトの格納先のid先
-        // offset
-
-        GLES20.glGenTextures(1,tex_id,0);
-        //GLES20.glPixelStorei
-        //commnad UNPACK…テクスチャをピクセルにアップ PACLK…テクスチャからテクセルをダウンロード
-        // 何バイトごとの区切りか
-        GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT,1);
-        //メモリの利用方法　target
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);
-        //VRAMへピクセル情報をコピー
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,GLES20.GL_RGBA,bitmap,0);
-        //SetFilterring
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MAG_FILTER,GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_NEAREST);
-        //m_Texture_p = MyGLES20Utiles.loadTexture(bitmap);
-
-        //bye bitmap
-        bitmap.recycle();
-    }
-
-    @Override
-    public int LoadShaderFile(String vertex, String fragment) {
-        //未実装
-        return 0;
-    }
-
-    @Override
-    public int loadShader(int type, String shaderCode) {
-        //シェーダーオブジェクトの生成
-        int shader = GLES20.glCreateShader(type);
-        //シェーダーオブジェクトとソースコードを結びつける
-        GLES20.glShaderSource(shader, shaderCode);
-        //コンパイル
-        GLES20.glCompileShader(shader);
-        return shader;
+        textureobj = new TextureObj("texture","tex_sample.bmp");
     }
 
     @Override
@@ -149,7 +84,7 @@ public class Polygon extends C_Geometry{
         int m_texture = GLES20.glGetUniformLocation(shaderProgram,"texture");
         GLES20.glEnableVertexAttribArray(m_texture);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);//どのテクスチャのGPUを使うか？？？
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,m_Texture_p);//どのテクスチャを使うか？
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textureobj.GetTextureId());//どのテクスチャを使うか？
         GLES20.glUniform1i(m_texture,0);
 
 

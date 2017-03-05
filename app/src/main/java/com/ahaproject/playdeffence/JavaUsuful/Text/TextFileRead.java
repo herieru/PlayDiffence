@@ -62,7 +62,6 @@ public class TextFileRead {
         }catch (IOException es)
         {
             text = "io error";
-
         }
     }
 
