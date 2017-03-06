@@ -2,6 +2,8 @@ package com.ahaproject.playdeffence.TouchController;
 
 import android.view.MotionEvent;
 
+import com.ahaproject.playdeffence.Velocity.Vector3;
+
 /**
  * Created by akihiro on 2016/12/13.
  * タッチイベントに対して、アクセスする関数群
@@ -22,6 +24,7 @@ class TouchInfoAccess {
     public TouchInfoAccess()
     {
       super();
+        have_touchinfo =  new TouchInfoStruct();
     }
 
     //インデックスポインタを返却
@@ -74,16 +77,24 @@ class TouchInfoAccess {
     }
 
     //離したので、情報いらなくなったので、中身をリセット。
-    public void ResetPointer(
-            float pos_x,            //位置
-            float pos_y            //位置
-    )
+    public void ResetPointer()
     {
         have_touchinfo.use = false;
-
         //これはUpdateにて更新する
-        //have_touchinfo.p_index = -1;
+        have_touchinfo.p_index = -1;
+        have_touchinfo.touch_x = -10;
+        have_touchinfo.touch_y = -10;
     }
+
+    public Vector3 GetInfo()
+    {
+        Vector3 pos = new Vector3();
+        pos.x = have_touchinfo.touch_x;
+        pos.y = have_touchinfo.touch_y;
+        pos.z = 0;
+        return pos;
+    }
+
 
 
     //毎回のメインフレーム時に更新
@@ -92,6 +103,8 @@ class TouchInfoAccess {
 
     }
 
+
+    //=================================================================
 
 
 //タッチした情報を基に、何か

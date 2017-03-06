@@ -105,7 +105,6 @@ class MainActivity extends Activity implements SensorEventListener{
     public boolean onTouchEvent(MotionEvent event)
     {
         touch.SetTouchEvent(event);
-
         return true;//常に消化したとする
     }
 
@@ -116,13 +115,12 @@ class MainActivity extends Activity implements SensorEventListener{
         //  Auto-generated method stub
         switch( event.sensor.getType() ) {
             case Sensor.TYPE_ACCELEROMETER: // 加速度　かたむきを取得
-                System.out.println("Veloc   X?:"+event.values[0]+"Y?:"+event.values[1]+"Z?:"+event.values[2]);
+                //System.out.println("Veloc   X?:"+event.values[0]+"Y?:"+event.values[1]+"Z?:"+event.values[2]);
                 break;
             case Sensor.TYPE_GYROSCOPE: // ジャイロ
                // System.out.println("GYAIRO    X?:"+event.values[0]+"Y?:"+event.values[1]+"Z?:"+event.values[2]);
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD: // 磁力
-
                 break;
         }
 
@@ -131,6 +129,5 @@ class MainActivity extends Activity implements SensorEventListener{
     //センサーの精度
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 }

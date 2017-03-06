@@ -1,10 +1,14 @@
 package com.ahaproject.playdeffence.Geometry;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.ahaproject.playdeffence.GLESUsuful.Shader.ShaderObj;
 import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
 import com.ahaproject.playdeffence.JavaUsuful.Texture.TextureObj;
+import com.ahaproject.playdeffence.TouchController.TouchManager;
+import com.ahaproject.playdeffence.Velocity.Vector3;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -47,6 +51,13 @@ public class Polygon extends C_Geometry{
         Matrix.setIdentityM(mat,0);
         textureobj = new TextureObj("texture","tex_sample.bmp");
     }
+
+    public void Update()
+    {
+        Vector3 pos = TouchManager.getInstance().GetTouchPositionDefault();
+        Log.d("RESULUTLOG:","X:"+pos.x+"Y:" + pos.y + "Z:" + pos.z);
+    }
+
 
     @Override
     public void draw() {
@@ -106,5 +117,14 @@ public class Polygon extends C_Geometry{
         //アクセスを無効にする？
         GLES20.glDisable(GLES20.GL_BLEND);
         GLES20.glDisable(GLES20.GL_TEXTURE_2D);
+
+
+        //以下関係ない実験のため最終的に削除
+
+        Vector3 pos = TouchManager.getInstance().GetTouchPositionDefault();
+        Log.d("RESULUTLOG:","X:"+pos.x+"Y:" + pos.y + "Z:" + pos.z);
+
+
+
     }
 }
