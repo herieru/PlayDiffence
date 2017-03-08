@@ -4,7 +4,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.ahaproject.playdeffence.GLESUsuful.Shader.ShaderObj;
-import com.ahaproject.playdeffence.JavaUsuful.Text.TextFileRead;
+import com.ahaproject.playdeffence.JavaUsuful.Texture.TextureManage;
 import com.ahaproject.playdeffence.JavaUsuful.Texture.TextureObj;
 import com.ahaproject.playdeffence.TouchController.TouchManager;
 import com.ahaproject.playdeffence.Velocity.Vector3;
@@ -95,9 +95,9 @@ public class Polygon extends C_Geometry{
         int m_texture = GLES20.glGetUniformLocation(shaderProgram,"texture");
         GLES20.glEnableVertexAttribArray(m_texture);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);//どのテクスチャのGPUを使うか？？？
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textureobj.GetTextureId());//どのテクスチャを使うか？
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,TextureManage.GetInstance().GetTextureID(TextureManage.GetInstance().TEX_SAMPLE));//どのテクスチャを使うか？
         GLES20.glUniform1i(m_texture,0);
-
+        //textureobj.GetTextureId()
 
         int m_texcoord = GLES20.glGetAttribLocation(shaderProgram,"texcoord");
         GLES20.glEnableVertexAttribArray(m_texcoord);
