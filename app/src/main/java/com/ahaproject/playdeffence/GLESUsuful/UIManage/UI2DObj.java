@@ -1,9 +1,14 @@
 package com.ahaproject.playdeffence.GLESUsuful.UIManage;
 
+import android.opengl.GLES20;
+
+import com.ahaproject.playdeffence.GLESUsuful.MyGLES20Utiles;
 import com.ahaproject.playdeffence.GLESUsuful.Shader.ShaderObj;
 import com.ahaproject.playdeffence.JavaUsuful.Singleton.GLManager;
 import com.ahaproject.playdeffence.TouchController.TouchManager;
 import com.ahaproject.playdeffence.Velocity.Vector3;
+
+import java.nio.FloatBuffer;
 
 /**
  * Created by akihiro on 2017/03/04.
@@ -28,6 +33,14 @@ public class UI2DObj {
     float[] vertecis = new float[12];//4角形表示のための頂点情報
     float[] tex_uv = new float[8];  //テクスチャUV
 
+    int m_positionAttrib_Handle;//ポジションをシェーダーに流すID
+    int m_matrix_Handle;//行列をシェーダーに流すID
+    int m_texture_Handle;//テクスチャを流すID
+    int m_texcode_Handle;//UVを流すID
+    //流すためのフローと府バッファー
+    FloatBuffer verticis_buf;
+    FloatBuffer texuv_buf;
+
     //作成時にそれを表示するかどうか
     public UI2DObj(boolean set_display, int set_depth,
                    float set_width, float set_heigth,
@@ -48,9 +61,17 @@ public class UI2DObj {
         //シェーダーの読み込み（シェーダーファイル未完成） 読み込みはファイル名指定
         shaderobj = new ShaderObj("vertex_plas_tex.txt","flag,emt_plas_tex.txt");
         shaderprogram = shaderobj.GetShaderProgram();
+        //シェーダーに流すための準備
+        m_positionAttrib_Handle = GLES20.glGetAttribLocation(shaderprogram,"vPosition");
+        GLES20.glEnableVertexAttribArray(m_positionAttrib_Handle);
+        m_texcode_Handle = GLES20.glGetAttribLocation(shaderprogram,"texcoord");
+        GLES20.glEnableVertexAttribArray(m_texcode_Handle);
+        m_texture_Handle = GLES20.glGetUniformLocation(shaderprogram,"texture");
+        GLES20.glEnableVertexAttribArray(m_texture_Handle);
+
     }
 
-    //このボタンを押したことによるオブジェクトの生成
+    //このボタンを押したことによるUIオブジェクトの生成
     public boolean CreateObj(float set_width, float set_heigth,
                              float set_center_x, float set_center_y)
     {
@@ -75,20 +96,26 @@ public class UI2DObj {
         //2.その間に入っているかを判断する。
         //3.入っていたらHit
         Vector3 screen = GLManager.GetInstance().GetWindowSize();
-        //各頂点の部分を取得 0~2.0fにしたあと上限を1.0fの間にする
-        float poly_sx = (m_center_x - m_ui_width  + 1.0f)/2;
-        float poly_sy = (m_center_y - m_ui_height + 1.0f)/2;
-        float poly_ex = (m_center_x + m_ui_width  + 1.0f)/2;
-        float poly_ey = (m_center_y + m_ui_height + 1.0f)/2;
+        //各頂点の部分を取得 0~2.0fにしたあと上限を1.0fの間にする その後スクリーン上の座標に置き換える
+        float poly_sx = (m_center_x - m_ui_width  + 1.0f)/2 * screen.x;
+        float poly_sy = (m_center_y - m_ui_height + 1.0f)/2 * screen.y;
+        float poly_ex = (m_center_x + m_ui_width  + 1.0f)/2 * screen.x;
+        float poly_ey = (m_center_y + m_ui_height + 1.0f)/2 * screen.y;
 
         //タッチの場所を取得
-        TouchManager.getInstance().GetTouchPositionDefault();
+        Vector3 pos = TouchManager.getInstance().GetTouchPositionDefault();
         //タッチの場所が上記のものを変換した範囲内か？
+        if(poly_sx < pos.x)//その点が起点（左上より左か？　ならはずれ
+                return false;
+        if(poly_sy < pos.y )//上記の高さver
+                return false;
+        if(poly_ex > pos.x)//エンドの点より外側ならはずれ
+                return false;
+        if(poly_ey > pos.y)//上記の高さ
+                return false;
         //結果を返す。
 
-
-
-
+        //TODO:何か十た時様に何kわかるものを配置していると良いかも
 
         return true;
     }
@@ -99,6 +126,22 @@ public class UI2DObj {
         if(mb_display)
         {
             //表示
+            GLES20.glUseProgram(shaderprogram);
+            // 背景とのブレンド方法を設定します。
+            GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+            //  GLES20.glEnable(GLES20.GL_BLEND);
+            // GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);	// 単純なアルファブレンド
+            // テクスチャの指定
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+           // GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, );
+             GLES20.glUniform1i(m_texture_Handle, 0);
+            //GLES20.glUniformMatrix4fv(mMatp,1,false,mat,0);
+            GLES20.glVertexAttribPointer(m_texcode_Handle, 2, GLES20.GL_FLOAT, false, 0,texuv_buf);
+            GLES20.glVertexAttribPointer(m_positionAttrib_Handle, 3, GLES20.GL_FLOAT, false, 0, verticis_buf);
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
+            //  GLES20.glDisable(GLES20.GL_BLEND);
+            GLES20.glDisable(GLES20.GL_TEXTURE_2D);
         }
 
     }

@@ -56,6 +56,11 @@ public class MySamplePolygon  extends C_Geometry{
 
     ShaderObj shaderObj;
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+    }
+
     //コンストラクタ
     public MySamplePolygon() {
         //uniformはCPUから定数
@@ -63,32 +68,26 @@ public class MySamplePolygon  extends C_Geometry{
         //コメント文を除いたシェーダーソースを読み込み
         shaderObj =new ShaderObj("vertex_plas_tex.txt","flag,emt_plas_tex.txt");
         shaderProgram = shaderObj.GetShaderProgram();
-        //シェーダーで使用するハンドルを取ってくる。
+        //シェーダーで使用するハンドルを取ってきて保存。
         mPositionp = GLES20.glGetAttribLocation(shaderProgram,"vPosition");
         MyGLES20Utiles.checkGlError("glGeAttribLocation position");
         if(mPositionp == -1)throw  new IllegalStateException("Could not get attrib location fotr position");
         GLES20.glEnableVertexAttribArray(mPositionp);
-
         mTexcoodp = GLES20.glGetAttribLocation(shaderProgram,"texcoord");
         MyGLES20Utiles.checkGlError("glGeAttribLocation texcoord");
         if(mTexcoodp == -1)throw  new IllegalStateException("Could not get attrib location fotr mtexcoord");
         GLES20.glEnableVertexAttribArray(mTexcoodp);
-
         mTexturep = GLES20.glGetUniformLocation(shaderProgram,"texture");
         MyGLES20Utiles.checkGlError("glGeAttribLocation texture");
         if(mTexturep == -1)throw  new IllegalStateException("Could not get attrib location fotr texture");
         GLES20.glEnableVertexAttribArray(mTexturep);
-
         mMatp = GLES20.glGetUniformLocation(shaderProgram,"uMVPMatrix");
         if(mMatp == -1)throw new IllegalStateException("Could not get uniform  location uMVPMatrix");
         GLES20.glEnableVertexAttribArray(mMatp);
-
         final Bitmap bitmap = BitmapFactory.decodeResource(ContextHave.getInstance().GetContext().getResources(),R.drawable.tex_sample);
         mTextureId = MyGLES20Utiles.loadTexture(bitmap);
         bitmap.recycle();
-
         Matrix.setIdentityM(mat,0);
-
     }
 
     @Override
@@ -109,10 +108,8 @@ public class MySamplePolygon  extends C_Geometry{
         GLES20.glVertexAttribPointer(mTexcoodp, 2, GLES20.GL_FLOAT, false, 0, mTexcoordBuffer);
         GLES20.glVertexAttribPointer(mPositionp, 3, GLES20.GL_FLOAT, false, 0, mVertexBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-
       //  GLES20.glDisable(GLES20.GL_BLEND);
         GLES20.glDisable(GLES20.GL_TEXTURE_2D);
-
     }
 
 }
